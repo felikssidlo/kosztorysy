@@ -1,40 +1,38 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
 
-// Definicja pojedynczej pozycji (nie jest osobną kolekcją, tylko schematem)
 @Schema()
 export class EstimateItem {
   @Prop({ required: true })
-  type: 'material' | 'service'; // [cite: 30, 35]
+  type: 'material' | 'service';
 
   @Prop({ required: true })
   name: string;
 
   @Prop()
-  quantity?: number; // Tylko dla materiału [cite: 32]
+  quantity?: number;
 
   @Prop()
-  unit?: string; // np. szt, m2 [cite: 33]
+  unit?: string;
 
   @Prop()
-  unitPrice?: number; // Cena jedn. [cite: 34]
+  unitPrice?: number;
 
   @Prop({ required: true })
-  value: number; // Wartość pozycji [cite: 39, 40]
+  value: number;
 }
 const EstimateItemSchema = SchemaFactory.createForClass(EstimateItem);
 
 // Główny dokument Kosztorysu
-@Schema({ timestamps: true }) // Automatyczne createdAt 
+@Schema({ timestamps: true })
 export class Estimate {
   @Prop({ required: true })
   title: string;
 
   @Prop({ type: [EstimateItemSchema], default: [] })
-  items: EstimateItem[]; // Lista pozycji 
+  items: EstimateItem[];
 
   @Prop({ default: 0 })
-  totalAmount: number; // Suma całkowita [cite: 5]
+  totalAmount: number;
 }
 
 export const EstimateSchema = SchemaFactory.createForClass(Estimate);

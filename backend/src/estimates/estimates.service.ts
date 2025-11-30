@@ -1,26 +1,102 @@
-import { Injectable } from '@nestjs/common';
-import { CreateEstimateDto } from './dto/create-estimate.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { CreateEstimateDto, EstimateItemDto } from './dto/create-estimate.dto';
 import { UpdateEstimateDto } from './dto/update-estimate.dto';
+import { Estimate } from './schemas/estimate.schema';
 
 @Injectable()
 export class EstimatesService {
-  create(createEstimateDto: CreateEstimateDto) {
-    return 'This action adds a new estimate';
+  constructor(
+    @InjectModel(Estimate.name) private estimateModel: Model<Estimate>,
+  ) {}
+
+  private calculateDetails(items: EstimateItemDto[]) {
+    if (!items || items.length === 0) {
+      return { items: [], totalAmount: 0 };
+    }
+
+    const calculatedItems = items.map((item) => {
+      let value = item.value || 0;
+
+      if (item.type === 'material') {
+        const quantity = item.quantity || 0;
+        const unitPrice = item.unitPrice || 0;
+        value = quantity * unitPrice;
+      }
+
+      return {
+        ...item,
+        value,
+      };
+    });
+
+    const totalAmount = calculatedItems.reduce(
+      (sum, item) => sum + item.value,
+      0,
+    );
+
+    return { items: calculatedItems, totalAmount };
   }
 
-  findAll() {
-    return `This action returns all estimates`;
+  async create(createEstimateDto: CreateEstimateDto): Promise<Estimate> {
+    const { items, totalAmount } = this.calculateDetails(
+      createEstimateDto.items || [],
+    );
+
+    const newEstimate = new this.estimateModel({
+      ...createEstimateDto,
+      items,
+      totalAmount,
+    });
+
+    return newEstimate.save();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} estimate`;
+  async findAll(): Promise<Estimate[]> {
+    return this.estimateModel.find().sort({ createdAt: -1 }).exec();
   }
 
-  update(id: number, updateEstimateDto: UpdateEstimateDto) {
-    return `This action updates a #${id} estimate`;
+  async findOne(id: string): Promise<Estimate> {
+    const estimate = await this.estimateModel.findById(id).exec();
+    if (!estimate) {
+      throw new NotFoundException(`Kosztorys o id #${id} nie istnieje`);
+    }
+    return estimate;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} estimate`;
+  async update(
+    id: string,
+    updateEstimateDto: UpdateEstimateDto,
+  ): Promise<Estimate> {
+    const updateData: any = { ...updateEstimateDto };
+
+    if (updateEstimateDto.items) {
+      const { items, totalAmount } = this.calculateDetails(
+        updateEstimateDto.items,
+      );
+      updateData.items = items;
+      updateData.totalAmount = totalAmount;
+    }
+
+    const updatedEstimate = await this.estimateModel
+      .findByIdAndUpdate(id, updateData, { new: true })
+      .exec();
+
+    if (!updatedEstimate) {
+      throw new NotFoundException(`Kosztorys o id #${id} nie istnieje`);
+    }
+
+    return updatedEstimate;
+  }
+
+  async remove(id: string): Promise<Estimate> {
+    const deletedEstimate = await this.estimateModel
+      .findByIdAndDelete(id)
+      .exec();
+    if (!deletedEstimate) {
+      throw new NotFoundException(`Kosztorys o id #${id} nie istnieje`);
+    }
+    return deletedEstimate;
   }
 }
