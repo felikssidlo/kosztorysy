@@ -19,6 +19,16 @@ const deleteEstimate = async (id: string) => {
   return response.data;
 };
 
+const fetchEstimate = async (id: string): Promise<Estimate> => {
+  const response = await apiClient.get<Estimate>(`/estimates/${id}`);
+  return response.data;
+};
+
+const updateEstimate = async ({ id, data }: { id: string; data: Partial<Estimate> }) => {
+  const response = await apiClient.patch<Estimate>(`/estimates/${id}`, data);
+  return response.data;
+};
+
 
 export const useEstimates = () => {
   const queryClient = useQueryClient();
@@ -52,5 +62,31 @@ export const useEstimates = () => {
     
     deleteEstimate: deleteMutation.mutate,
     isDeleting: deleteMutation.isPending,
+  };
+};
+
+export const useEstimate = (id: string) => {
+  const queryClient = useQueryClient();
+
+  const query = useQuery({
+    queryKey: ['estimate', id],
+    queryFn: () => fetchEstimate(id),
+    enabled: !!id,
+  });
+
+  const mutation = useMutation({
+    mutationFn: updateEstimate,
+    onSuccess: (updatedEstimate) => {
+      queryClient.setQueryData(['estimate', id], updatedEstimate);
+      queryClient.invalidateQueries({ queryKey: ['estimates'] });
+    },
+  });
+
+  return {
+    estimate: query.data,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    updateEstimate: mutation.mutateAsync,
+    isUpdating: mutation.isPending,
   };
 };
