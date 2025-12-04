@@ -9,7 +9,7 @@ function App() {
       <AppShell padding="md" header={{ height: 60 }}>
         <AppShell.Header p="xs">
            <Container size="lg">
-             <Title order={3}>🏗️ BudżetApp</Title>
+             <Title order={3}>Kosztorysy</Title>
            </Container>
         </AppShell.Header>
 

@@ -15,6 +15,7 @@ interface Props {
   close: () => void;
   onSubmit: (item: EstimateItem) => void;
   isLoading: boolean;
+  itemToEdit?: EstimateItem | null;
 }
 
 export const EstimateItemModal = ({
@@ -22,24 +23,36 @@ export const EstimateItemModal = ({
   close,
   onSubmit,
   isLoading,
+  itemToEdit,
 }: Props) => {
   const [type, setType] = useState<EstimateItemType>("material");
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState<string | number>(1);
   const [unit, setUnit] = useState("szt");
-  const [price, setPrice] = useState<string | number>(0);
-  const [value, setValue] = useState<string | number>(0);
+  const [price, setPrice] = useState<string | number>("");
+  const [value, setValue] = useState<string | number>("");
 
   useEffect(() => {
     if (opened) {
-      setType("material");
-      setName("");
-      setQuantity(1);
-      setUnit("szt");
-      setPrice("");
-      setValue("");
+      if (itemToEdit) {
+        // Tryb EDYCJI
+        setType(itemToEdit.type);
+        setName(itemToEdit.name);
+        setQuantity(itemToEdit.quantity || 1);
+        setUnit(itemToEdit.unit || "szt");
+        setPrice(itemToEdit.unitPrice || "");
+        setValue(itemToEdit.value || "");
+      } else {
+        // Tryb DODAWANIA (Reset)
+        setType("material");
+        setName("");
+        setQuantity(1);
+        setUnit("szt");
+        setPrice("");
+        setValue("");
+      }
     }
-  }, [opened]);
+  }, [opened, itemToEdit]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,8 +71,14 @@ export const EstimateItemModal = ({
   };
 
   return (
-    <Modal opened={opened} onClose={close} title="Dodaj pozycję" centered>
+    <Modal
+      opened={opened}
+      onClose={close}
+      title={itemToEdit ? "Edytuj pozycję" : "Dodaj pozycję"}
+      centered
+    >
       <form onSubmit={handleSubmit}>
+        {/* Usunięto zduplikowany Stack. Teraz jest tylko jeden formularz. */}
         <Stack>
           <Select
             label="Typ pozycji"
@@ -133,7 +152,7 @@ export const EstimateItemModal = ({
               Anuluj
             </Button>
             <Button type="submit" loading={isLoading}>
-              Dodaj
+              {itemToEdit ? "Zapisz zmiany" : "Dodaj"}
             </Button>
           </Group>
         </Stack>

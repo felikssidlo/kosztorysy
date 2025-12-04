@@ -1,34 +1,54 @@
-import { Table, ActionIcon } from '@mantine/core';
-import { IconTrash } from '@tabler/icons-react';
-import type { EstimateItem } from '../types';
-
+import { Table, ActionIcon, Tooltip } from "@mantine/core";
+import { IconPencil, IconTrash } from "@tabler/icons-react";
+import type { EstimateItem } from "../types";
+//TODO EDIT estimate item
 interface Props {
   items: EstimateItem[];
   onRemove: (index: number) => void;
+  onEdit: (index: number) => void;
 }
 
-export const EstimateItemsTable = ({ items, onRemove }: Props) => {
+export const EstimateItemsTable = ({ items, onRemove, onEdit }: Props) => {
   const formatCurrency = (val?: number) =>
-    val ? new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(val) : '-';
+    val
+      ? new Intl.NumberFormat("pl-PL", {
+          style: "currency",
+          currency: "PLN",
+        }).format(val)
+      : "-";
 
   const rows = items.map((item, index) => (
     <Table.Tr key={index}>
-      <Table.Td>{index + 1}</Table.Td> {/* Lp */}
-      <Table.Td>{item.type === 'material' ? 'Materiał' : 'Usługa'}</Table.Td>
+      <Table.Td>{index + 1}</Table.Td>
+      <Table.Td>{item.type === "material" ? "Materiał" : "Usługa"}</Table.Td>
       <Table.Td fw={500}>{item.name}</Table.Td>
-      
+
       <Table.Td>
-        {item.type === 'material' ? `${item.quantity} ${item.unit}` : '-'}
+        {item.type === "material" ? `${item.quantity} ${item.unit}` : "-"}
       </Table.Td>
-      
+
       <Table.Td>
-        {item.type === 'material' ? formatCurrency(item.unitPrice) : '-'}
+        {item.type === "material" ? formatCurrency(item.unitPrice) : "-"}
       </Table.Td>
-      
+
       <Table.Td fw={700}>{formatCurrency(item.value)}</Table.Td>
-      
+
       <Table.Td>
-        <ActionIcon color="red" variant="subtle" onClick={() => onRemove(index)}>
+        <Tooltip label="Zmień nazwę">
+          <ActionIcon
+            variant="subtle"
+            color="blue"
+            onClick={() => onEdit(index)}
+          >
+            <IconPencil size={18} />
+          </ActionIcon>
+        </Tooltip>
+
+        <ActionIcon
+          color="red"
+          variant="subtle"
+          onClick={() => onRemove(index)}
+        >
           <IconTrash size={16} />
         </ActionIcon>
       </Table.Td>
