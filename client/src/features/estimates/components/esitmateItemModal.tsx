@@ -35,7 +35,6 @@ export const EstimateItemModal = ({
   useEffect(() => {
     if (opened) {
       if (itemToEdit) {
-        // Tryb EDYCJI
         setType(itemToEdit.type);
         setName(itemToEdit.name);
         setQuantity(itemToEdit.quantity || 1);
@@ -43,7 +42,6 @@ export const EstimateItemModal = ({
         setPrice(itemToEdit.unitPrice || "");
         setValue(itemToEdit.value || "");
       } else {
-        // Tryb DODAWANIA (Reset)
         setType("material");
         setName("");
         setQuantity(1);
@@ -78,7 +76,6 @@ export const EstimateItemModal = ({
       centered
     >
       <form onSubmit={handleSubmit}>
-        {/* Usunięto zduplikowany Stack. Teraz jest tylko jeden formularz. */}
         <Stack>
           <Select
             label="Typ pozycji"

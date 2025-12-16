@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose'; // <--- Importuj to
+import { MongooseModule } from '@nestjs/mongoose';
 import { EstimatesService } from './estimates.service';
 import { EstimatesController } from './estimates.controller';
-import { Estimate, EstimateSchema } from './schemas/estimate.schema'; // <--- Importuj schemat
+import { Estimate, EstimateSchema } from './schemas/estimate.schema';
 
 @Module({
   imports: [

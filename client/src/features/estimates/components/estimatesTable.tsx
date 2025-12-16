@@ -1,5 +1,5 @@
 import { Table, Group, Text, ActionIcon, Anchor } from '@mantine/core';
-import { IconTrash, IconEye } from '@tabler/icons-react'; // lub zwykłe napisy jeśli nie instalowałeś ikon
+import { IconTrash, IconEye } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import type { Estimate } from '../types';
 

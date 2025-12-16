@@ -1,7 +1,7 @@
 import { Table, ActionIcon, Tooltip } from "@mantine/core";
 import { IconPencil, IconTrash } from "@tabler/icons-react";
 import type { EstimateItem } from "../types";
-//TODO EDIT estimate item
+
 interface Props {
   items: EstimateItem[];
   onRemove: (index: number) => void;

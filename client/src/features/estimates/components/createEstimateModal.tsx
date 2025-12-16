@@ -31,7 +31,7 @@ export const CreateEstimateModal = ({ opened, close }: Props) => {
     <Modal 
       opened={opened} 
       onClose={close} 
-      title="Nowy Kosztorys" 
+      title="Nowy Kosztorys"
       centered
     >
       <form onSubmit={handleSubmit}>
